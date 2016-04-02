@@ -1,6 +1,3 @@
-var canvas = document.getElementById("gameCanvas");
-var context = canvas.getContext("2d");
-
 var startFrameMillis = Date.now();
 var endFrameMillis = Date.now();
 
@@ -29,9 +26,6 @@ function getDeltaTime()
 
 //-------------------- Don't modify anything above here
 
-var SCREEN_WIDTH = canvas.width;
-var SCREEN_HEIGHT = canvas.height;
-
 
 // some variables to calculate the Frames Per Second (FPS - this tells use
 // how fast our game is running, and allows us to make the game run at a 
@@ -45,6 +39,11 @@ var chuckNorris = document.createElement("img");
 chuckNorris.src = "hero.png";
 var player = new Player();
 var keyboard = new Keyboard();
+var enemy = new Enemy();
+
+	//Create an array to hold all the bullets.
+var bullets = [];
+
 
 function run()
 {
@@ -52,11 +51,80 @@ function run()
 	context.fillRect(0, 0, canvas.width, canvas.height);
 	
 	var deltaTime = getDeltaTime();
-
-	player.update(deltaTime);
-	player.draw();
+	
+	//Update shootTimer.
+	if(shootTimer > 0)
+	shootTimer -= deltaTime;
+	
+	//Create new bullet if appropriate.
+	if(player.shooting)
+	{
+		console.log("player shooting");
+	}
+	else
+	{
+		console.log("player not shooting");
+	}
+	
+	//console.log("bullets.length = " + bullets.length);
 		
-	//	context.drawImage(chuckNorris, SCREEN_WIDTH/2 - chuckNorris.width/2, SCREEN_HEIGHT/2 - chuckNorris.height/2);
+	if (player.shooting && shootTimer <=0 && player.alive)
+	{
+		shootTimer += 0.3;
+		player.shoot();
+	}
+
+	//Check if any bullet has gone out of the screen boundaries
+	//and if so kill it.
+	for(var i=bullets.length-1; i>=0; i--)
+	{
+		if(bullets[i].x < 0
+			|| bullets[i].x > SCREEN_WIDTH
+			|| bullets[i].y < 0
+			|| bullets[i].y > SCREEN_HEIGHT)
+		{
+			bullets.splice(i, 1);
+		}
+	}
+	
+	//	console.log("player updating");
+	player.update(deltaTime);
+	
+	if (bullets.length >= 0)
+	{
+		for(var i=bullets.length-1; i>=0; i--)
+		{
+			bullets[i].update(deltaTime);
+		};
+	}
+	
+	//Check if any bullet has hit enemy.  If so, kill them both.
+	if (bullets.length >= 0 && enemy.alive)
+	{
+		for(var i=bullets.length-1; i>=0; i--)
+		{
+			if (collideswith(bullets[i],enemy))
+			{
+				bullets.splice(i,1);
+				enemy.alive = false;
+				console.log("enemy hit");
+			}
+		};
+	};
+
+	player.draw();
+	if (enemy.alive)                 
+	{
+		enemy.draw();
+	};	
+
+	if (bullets.length >= 0)
+	{
+		for(var i=bullets.length-1; i>=0; i--)
+		{
+			bullets[i].draw(deltaTime);
+		};
+	};
 		
 	// update the frame counter 
 	fpsTime += deltaTime;
