@@ -50,6 +50,8 @@ function run()
 	context.fillStyle = "#ccc";		
 	context.fillRect(0, 0, canvas.width, canvas.height);
 	
+	drawMap();
+	
 	var deltaTime = getDeltaTime();
 	
 	//Update shootTimer.
