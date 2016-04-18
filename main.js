@@ -144,6 +144,8 @@ function run()
 	context.fillText("FPS: " + fps, 5, 20, 100);
 }
 
+initialize();
+
 
 //-------------------- Don't modify anything below here
 
