@@ -115,6 +115,8 @@ function run()
 	};
 
 	player.draw();
+
+    /*
 	if (enemy.alive)                 
 	{
 		enemy.draw();
@@ -127,6 +129,7 @@ function run()
 			bullets[i].draw(deltaTime);
 		};
 	};
+    */
 		
 	// update the frame counter 
 	fpsTime += deltaTime;

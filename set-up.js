@@ -14,14 +14,13 @@ var TILESET_COUNT_Y = 14;
 var tileset = document.createElement("img");
 tileset.src = "tileset.png";
 var cells = [];
-var LAYER_COUNT = 3;
-var LAYER_BACKGROUND = 0;
-var LAYER_PLATFORMS = 1;
-var LAYER_LADDERS = 2;
+var LAYER_COUNT = 2;
+var LAYER_PLATFORMS = 0;
+var LAYER_LADDERS = 1;
 //Arbitrary choice for 1m
 var METER = TILE;
 //Very exaggerated gravity (6x)
-var GARVITY = METER * 9.8 * 6;
+var GRAVITY = METER * 9.8 * 6;
 //Max horizonatal speed (10 tiles per second)
 var MAXDX = METER * 10;
 //Max vertical speed (15 tiles per second)
@@ -72,7 +71,7 @@ function cellAtTileCoord(layer, tx, ty)
 {
     if(tx<0 || tx>MAP.tw || ty<0)
     {
-        return 1:
+        return 1;
         //Let the player drop off the bottom of the screen. (This means death.)
     }
     else
@@ -118,60 +117,3 @@ function bound(value, min, max)
     }
 }
 
-//This function draws the level map.
-function drawMap()
-{
-	console.log("drawing map");
-	for(var layerIdx=0;layerIdx<LAYER_COUNT;layerIdx++)
-	{
-		var idx = 0;
-		for(var y = 0;y<level1.layers[layerIdx].height; y++)
-		{
-			for(var x=0; x<level1.layers[layerIdx].width; x++)
-			{
-				console.log("data ="+level1.layers[layerIdx].data[idx]);
-				if(level1.layers[layerIdx].data[idx] != 0)
-				{
-					//the tiles in the Tiled map are base 1 (meaning a value of 0 means no tile), so subtract one from the tileset id to get the
-					//correct tile
-					var tileIndex = level1.layers[layerIdx].data[idx] - 1;
-					var sx = TILESET_PADDING + (tileIndex % TILESET_COUNT_X)*(TILESET_TILE + TILESET_SPACING);
-					var sy = TILESET_PADDING + Math.floor(tileIndex/TILESET_COUNT_Y)*(TILESET_TILE + TILESET_SPACING);
-					context.drawImage(tileset, sx, sy, TILESET_TILE, TILESET_TILE, x*TILE, (y-1)*TILE, TILESET_TILE, TILESET_TILE);
-				}
-				idx++;
-			}
-		}	
-	}
-}
-
-function initialize() 
-{
-    for(var layerIdx = 0; layerIdx < LAYER_COUNT; layerIdx++) 
-    {
-        cells[layerIdx] = [];
-        var idx = 0;
-        for (var y = 0; y < level1.layers[layerIdx].height; y++)
-        {
-            cells[layerIdx][y] = [];
-            for (var x = 0; x < level1.layer[layerIdx].width; x++) 
-            {
-                if(level1.layers[layerIdx].data[idx]) !=0) 
-                {     
-                    // for each tile we find in the layer data, we need to create 4 collisions
-                    // (because our collision squares are 35x35 but the tiles in the level are 70x70)
-                    cells[layerIdx][y][x] = 1;
-                    cells[layerIdx][y-1][x] = 1;
-                    cells[layerIdx][y-1][x+1] = 1;
-                    cells[layerIdx][y][x] = 0;
-                }
-            else if cells[layerIdx][y][x] != 1)
-                {
-                    // if we haven't set this cell's value, then set it to 0 now
-                    cells[layerIdx][y][x] = 0:
-                }
-                idx++;
-            }
-        }
-    }
-}

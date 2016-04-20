@@ -1,18 +1,21 @@
-var Vector2 = function(){
+var Vector2 = function()
+{
 	this.x = 0;
 	this.y = 0;	
 };
 
-Vector2.prototype.set = function(newX,newY){
+Vector2.prototype.set = function(newX,newY)
+{
 	this.x = newX;
 	this.y = newY;
 };
 
-Vector2.prototype.normalize = function(){
-	if
+Vector2.prototype.normalize = function()
+{
+    if(this.x = 0 && this.y == 0)
 	{
-		this.x = 0 && this.y == 0 then return;
-	}
+	     return;
+    }
 	else
 	{
 		var magnitude = math.sqrt((this.x*this.x)+(this.y*this.y));
