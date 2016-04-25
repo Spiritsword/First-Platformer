@@ -31,6 +31,17 @@ var ACCEL = MAXDX * 2;
 var FRICTION = MAXDX * 6;
 //(a large) instntaneous jump impulse
 var JUMP = METER * 1500;
+var STATE_SPLASH = 0;
+var STATE_GAME = 1;
+var STATE_GAMEOVER = 2;
+var splashImage = document.createElement("img");
+splashImage.src = "grass_background.jpg";
+
+var gameoverImage = document.createElement("img");
+gameoverImage.src = "grass_background.jpg";
+
+
+
 
 function intersects(x1, y1, w1, h1, x2, y2, w2, h2)
 {

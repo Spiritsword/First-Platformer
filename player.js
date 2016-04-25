@@ -27,6 +27,7 @@ Player.prototype.update = function (deltaTime) {
     }
     if (keyboard.isKeyDown(keyboard.KEY_RIGHT) == true) {
         right = true;
+        console.log("right is pressed");
     }
     if (keyboard.isKeyDown(keyboard.KEY_SPACE) == true) {
         jump = true;
@@ -48,7 +49,8 @@ Player.prototype.update = function (deltaTime) {
     }
 
     if (right) {
-        ddx = ddx + ACCEL;  //Player wants to go left.
+//      console.log("accelerating right");
+        ddx = ddx + ACCEL;  //Player wants to go right.
     }
     else {
         if (wasright) {
@@ -68,7 +70,7 @@ Player.prototype.update = function (deltaTime) {
     this.velocity.y = bound(this.velocity.y + (deltaTime * ddy), -MAXDY, MAXDY);
 
     //Clamping code to prevent jiggle.
-    if ((wasleft && (this.velocity.x > 0)) || wasright && (this.velocity.x > 0)) {
+    if ((wasleft && (this.velocity.x > 0)) || wasright && (this.velocity.x < 0)) {
         this.velocity.x = 0;
     }
 
@@ -139,11 +141,13 @@ Player.prototype.draw = function()
 {
 	context.save();
 		context.translate(this.position.x, this.position.y);
-		context.rotate(this.rotation);
-		context.drawImage(this.image, -this.width/2, -this.height/2);
-	context.restore();
+//      context.rotate(this.rotation);
+ //		context.drawImage(this.image, -this.width/2, -this.height/2);
+		context.drawImage(this.image, this.offset.x, this.offset.y);
+    	context.restore();
 }
 
+/*
 Player.prototype.shoot = function()
  {
 	console.log("shoot called");
@@ -170,4 +174,4 @@ Player.prototype.shoot = function()
 	//Add bullet to list.
 	bullets.push(bullet);
  }
-	 
+*/ 

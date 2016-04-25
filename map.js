@@ -45,7 +45,6 @@ var level1 =
 //This function draws the level map.
 function drawMap()
 {
-    console.log("drawing map");
     for (var layerIdx = 0; layerIdx < LAYER_COUNT; layerIdx++)
     {
         var idx = 0;
@@ -53,7 +52,7 @@ function drawMap()
         {
             for (var x = 0; x < level1.layers[layerIdx].width; x++)
             {
-                console.log("data =" + level1.layers[layerIdx].data[idx]);
+//              console.log("data =" + level1.layers[layerIdx].data[idx]);
                 if (level1.layers[layerIdx].data[idx] != 0)
                 {
                     //the tiles in the Tiled map are base 1 (meaning a value of 0 means no tile), so subtract one from the tileset id to get the

@@ -44,16 +44,46 @@ var enemy = new Enemy();
 	//Create an array to hold all the bullets.
 var bullets = [];
 
-
-function run()
+function runSplash(deltaTime)
 {
-	context.fillStyle = "#ccc";		
-	context.fillRect(0, 0, canvas.width, canvas.height);
-	
-	drawMap();
-	
-	var deltaTime = getDeltaTime();
-	
+    context.drawImage(splashImage, 0, 0);
+    context.fillStyle = "#000";
+    context.font = "96px Impact";
+    splashMessage = "BLADE GUNNER";
+    splashMeasure = context.measureText(splashMessage);
+    context.fillText(splashMessage, SCREEN_WIDTH * 1 / 2 - (splashMeasure.width / 2), SCREEN_HEIGHT * 1 / 2 + 20);
+    splashTimer -= deltaTime;
+    if (splashTimer <= 0) {
+        gameState = STATE_GAME;
+        return;
+    }
+}
+
+function runGameover(deltaTime)
+{
+    context.drawImage(gameoverImage, 0, 0);
+
+    context.font = "96px Impact";
+    gameoverMessage = "GAME OVER";
+    gameoverMeasure = context.measureText(gameoverMessage);
+
+//  context.font = "48px Impact";
+//  scoreMessage = "YOUR SCORE = " + score;
+//  var scoreMeasure = context.measureText(scoreMessage);
+
+    context.fillStyle = "#900";
+    context.font = "96px Impact";
+    context.fillText(gameoverMessage, SCREEN_WIDTH * 1 / 2 - (gameoverMeasure.width / 2), SCREEN_HEIGHT * 1 / 2 + 10);
+
+//  context.font = "48px Impact";
+//  context.fillText(scoreMessage, SCREEN_WIDTH * 1 / 2 - (scoreMeasure.width / 2), SCREEN_HEIGHT * 3 / 4 - 20);
+}
+
+
+
+function runGame(deltaTime)
+{
+/*
 	//Update shootTimer.
 	if(shootTimer > 0)
 	shootTimer -= deltaTime;
@@ -61,11 +91,11 @@ function run()
 	//Create new bullet if appropriate.
 	if(player.shooting)
 	{
-		console.log("player shooting");
+//		console.log("player shooting");
 	}
 	else
 	{
-		console.log("player not shooting");
+//		console.log("player not shooting");
 	}
 	
 	//console.log("bullets.length = " + bullets.length);
@@ -88,6 +118,7 @@ function run()
 			bullets.splice(i, 1);
 		}
 	}
+
 	
 	//	console.log("player updating");
 	player.update(deltaTime);
@@ -113,8 +144,15 @@ function run()
 			}
 		};
 	};
-
-	player.draw();
+*/
+    console.log("updating player");
+    drawMap();
+    player.update(deltaTime);
+    player.draw();
+    if (player.position.y > SCREEN_HEIGHT)
+    {
+        gameState = STATE_GAMEOVER;
+    }
 
     /*
 	if (enemy.alive)                 
@@ -147,8 +185,29 @@ function run()
 	context.fillText("FPS: " + fps, 5, 20, 100);
 }
 
-initialize();
 
+function run() {
+    context.fillStyle = "#ccc";
+    context.fillRect(0, 0, canvas.width, canvas.height);
+
+    var deltaTime = getDeltaTime();
+    switch (gameState) {
+        case STATE_SPLASH:
+            runSplash(deltaTime);
+            break;
+        case STATE_GAME:
+            runGame(deltaTime);
+            break;
+        case STATE_GAMEOVER:
+            runGameover(deltaTime);
+            break;
+    }
+}
+
+
+initialize();
+gameState = STATE_SPLASH;
+splashTimer = 3;
 
 //-------------------- Don't modify anything below here
 
