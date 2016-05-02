@@ -167,7 +167,7 @@ function runGame(deltaTime)
 			bullets[i].draw(deltaTime);
 		};
 	};
-    */
+
 		
 	// update the frame counter 
 	fpsTime += deltaTime;
@@ -183,6 +183,8 @@ function runGame(deltaTime)
 	context.fillStyle = "#f00";
 	context.font="14px Arial";
 	context.fillText("FPS: " + fps, 5, 20, 100);
+	*/
+	
 }
 
 
