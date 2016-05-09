@@ -39,7 +39,7 @@ var chuckNorris = document.createElement("img");
 chuckNorris.src = "hero.png";
 var player = new Player();
 var keyboard = new Keyboard();
-var enemy = new Enemy();
+// var enemy = new Enemy();
 
 	//Create an array to hold all the bullets.
 var bullets = [];
@@ -146,12 +146,26 @@ function runGame(deltaTime)
 	};
 */
     console.log("updating player");
-    drawMap();
     player.update(deltaTime);
+    console.log("drawing map");
+    drawMap(pixelToTile(player.position.x), (TILE + player.position.x - tileToPixel(player.position.x)));
+    console.log("drawing player");
     player.draw();
     if (player.position.y > SCREEN_HEIGHT)
     {
         gameState = STATE_GAMEOVER;
+    }
+    //score
+    context.fillStyle = "#D50020";
+    context.font = "24px Arial";
+    var scoreText = "SCORE: " + score;
+    context.fillText(scoreText, SCREEN_WIDTH - 198, 453);
+
+    //lives
+    for(var i=0; i<lives; i++)
+    {
+        console.log(lifeImage);
+        context.drawImage(lifeImage, 0, 0, LIFETILE_WIDTH, LIFETILE_HEIGHT, 20 + ((LIFETILE_WIDTH + 2) * i), 427, LIFETILE_WIDTH, LIFETILE_HEIGHT);
     }
 
     /*
@@ -216,21 +230,29 @@ splashTimer = 3;
 
 // This code will set up the framework so that the 'run' function is called 60 times per second.
 // We have a some options to fall back on in case the browser doesn't support our preferred method.
-(function() {
+(function ()
+{
   var onEachFrame;
-  if (window.requestAnimationFrame) {
-    onEachFrame = function(cb) {
-      var _cb = function() { cb(); window.requestAnimationFrame(_cb); }
-      _cb();
+  if (window.requestAnimationFrame)
+  {
+    onEachFrame = function (cb)
+    {
+        var _cb = function() { cb(); window.requestAnimationFrame(_cb); }
+        _cb();
     };
-  } else if (window.mozRequestAnimationFrame) {
+  }
+  else if (window.mozRequestAnimationFrame)
+  {
     onEachFrame = function(cb) {
-      var _cb = function() { cb(); window.mozRequestAnimationFrame(_cb); }
-      _cb();
+        var _cb = function() { cb(); window.mozRequestAnimationFrame(_cb); }
+        _cb();
     };
-  } else {
-    onEachFrame = function(cb) {
-      setInterval(cb, 1000 / 60);
+  }
+  else
+  {
+    onEachFrame = function (cb)
+    {
+        setInterval(cb, 1000 / 60);
     }
   }
   

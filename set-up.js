@@ -4,7 +4,7 @@ var SCREEN_WIDTH = canvas.width;
 var SCREEN_HEIGHT = canvas.height;
 var shootTimer = 0;
 var LAYER_COUNT = 2;
-var MAP = {tw: 20, th:15};
+var MAP = {tw: 60, th:20};
 var TILE = 35;
 var TILESET_TILE = TILE*2;
 var TILESET_PADDING = 2;
@@ -14,9 +14,11 @@ var TILESET_COUNT_Y = 14;
 var tileset = document.createElement("img");
 tileset.src = "tileset.png";
 var cells = [];
-var LAYER_COUNT = 2;
-var LAYER_PLATFORMS = 0;
-var LAYER_LADDERS = 1;
+var LAYER_COUNT = 3;
+var LAYER_BACKGROUND = 0
+var LAYER_PLATFORMS = 1;
+var LAYER_LADDERS = 2;
+var maxTiles = Math.floor(SCREEN_WIDTH / TILE) + 2;
 //Arbitrary choice for 1m
 var METER = TILE;
 //Very exaggerated gravity (6x)
@@ -39,8 +41,12 @@ splashImage.src = "grass_background.jpg";
 
 var gameoverImage = document.createElement("img");
 gameoverImage.src = "grass_background.jpg";
-
-
+var score = 0;
+var lives = 3;
+var lifeImage = document.createElement("img");
+lifeImage.src = "lifesprites.png";
+var LIFETILE_WIDTH = 36;
+var LIFETILE_HEIGHT = 32;
 
 
 function intersects(x1, y1, w1, h1, x2, y2, w2, h2)
