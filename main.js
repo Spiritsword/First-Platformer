@@ -148,9 +148,24 @@ function runGame(deltaTime)
     console.log("updating player");
     player.update(deltaTime);
     console.log("drawing map");
-    drawMap(pixelToTile(player.position.x), (TILE + player.position.x - tileToPixel(player.position.x)));
+    tileX = pixelToTile(player.position.x);
+    startX = tileX - Math.floor(maxTiles / 2);
+    offsetX = (TILE + player.position.x - tileToPixel(tileX));
+    if (startX < -1)
+    {
+        startX = 0;
+        offsetX = 0;
+    }
+    if (startX > MAP.tw - maxTiles)
+    {
+        startX = MAP.tw - maxTiles + 1;
+        offsetX = TILE;
+    }
+    worldOffsetX = startX * TILE + offsetX;
+    drawMap(startX, offsetX);
+    //drawMap(9, -35);
     console.log("drawing player");
-    player.draw();
+    player.draw(worldOffsetX);
     if (player.position.y > SCREEN_HEIGHT)
     {
         gameState = STATE_GAMEOVER;
@@ -164,7 +179,6 @@ function runGame(deltaTime)
     //lives
     for(var i=0; i<lives; i++)
     {
-        console.log(lifeImage);
         context.drawImage(lifeImage, 0, 0, LIFETILE_WIDTH, LIFETILE_HEIGHT, 20 + ((LIFETILE_WIDTH + 2) * i), 427, LIFETILE_WIDTH, LIFETILE_HEIGHT);
     }
 

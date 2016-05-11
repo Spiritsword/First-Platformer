@@ -3,7 +3,6 @@ var context = canvas.getContext("2d");
 var SCREEN_WIDTH = canvas.width;
 var SCREEN_HEIGHT = canvas.height;
 var shootTimer = 0;
-var LAYER_COUNT = 2;
 var MAP = {tw: 60, th:20};
 var TILE = 35;
 var TILESET_TILE = TILE*2;
@@ -19,6 +18,7 @@ var LAYER_BACKGROUND = 0
 var LAYER_PLATFORMS = 1;
 var LAYER_LADDERS = 2;
 var maxTiles = Math.floor(SCREEN_WIDTH / TILE) + 2;
+console.log("maxtiles =" + maxTiles);
 //Arbitrary choice for 1m
 var METER = TILE;
 //Very exaggerated gravity (6x)

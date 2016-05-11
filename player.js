@@ -166,6 +166,8 @@ Player.prototype.update = function (deltaTime)
     var cellright = cellAtTileCoord(LAYER_PLATFORMS, tx + 1, ty);
     var celldown = cellAtTileCoord(LAYER_PLATFORMS, tx, ty + 1);
     var celldiag = cellAtTileCoord(LAYER_PLATFORMS, tx + 1, ty + 1);
+    console.log("collision matrix =" + cell + cellright + celldown + celldiag);
+    console.log("tileX =" + Math.floor(this.position.x/TILE));
 
     //If the player has vertical velocity, then check to see if they have hit a platform
     //below or above, in which case, stop their vertical velocity, and clamp their
@@ -212,8 +214,11 @@ Player.prototype.update = function (deltaTime)
 }
 
 
-Player.prototype.draw = function()
+Player.prototype.draw = function(worldOffsetX)
 {
+    console.log("this.position.x =" + this.position.x);
+    console.log("worldOffsetX =" + worldOffsetX);
+    console.log("Drawn position =" + (this.position.x - worldOffsetX));
 	this.sprite.draw(context, this.position.x - worldOffsetX, this.position.y);
 }
 
