@@ -55,6 +55,17 @@ var musicBackground;
 var sfxFire;
 var sfxExplosion;
 var newState = true;
+var RUN_JUMP = 0;
+var CLIMB= 1;
+var AIR = 0;
+var LAND = 1;
+var LEFT = 0;
+var RIGHT = 1;
+var STILL = 2;
+var UP = 0
+var DOWN = 1;
+var ASCEND_SPEED = 200;
+var DESCEND_SPEED = 300;
 
 
 
