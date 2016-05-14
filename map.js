@@ -129,7 +129,7 @@ function drawMap(startX, offsetX)
     }
 }
 
-function initialize()
+function mapInitialize()
 {
     for (var layerIdx = 0; layerIdx < LAYER_COUNT; layerIdx++)
     {

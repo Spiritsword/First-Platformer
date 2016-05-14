@@ -38,6 +38,7 @@ var Player = function ()
     this.falling = true;
     this.jumping = false;
     this.direction = LEFT;
+    this.cooldownTimer = 0;
 };
 
 Player.prototype.update = function (deltaTime)
@@ -85,7 +86,7 @@ Player.prototype.update = function (deltaTime)
             }
         }
     }
-    if (keyboard.isKeyDown(keyboard.KEY_SPACE) == true)
+    if (keyboard.isKeyDown(keyboard.KEY_UP) == true)
     {
         jump = true;
         if(left == true)
@@ -96,6 +97,21 @@ Player.prototype.update = function (deltaTime)
         {
             this.sprite.setAnimation(ANIM_JUMP_RIGHT);
         }
+    }
+
+    if (this.cooldownTimer > 0)
+    {
+        this.cooldownTimer -= deltaTime;
+    }
+    console.log("cooldownTimer =" + this.cooldownTimer);
+    console.log("firing =" + (keyboard.isKeyDown(keyboard.KEY_SPACE) == true));
+    console.log("recharged =" + (this.cooldownTimer <= 0));
+    if (keyboard.isKeyDown(keyboard.KEY_SPACE) == true && this.cooldownTimer <= 0)
+    {
+        console.log("fireSound");
+        sfxFire.play();
+        this.shoot();     //Shoot a bullet
+        this.cooldownTimer = 0.3;
     }
 
     var wasleft = this.velocity.x < 0;
@@ -166,8 +182,6 @@ Player.prototype.update = function (deltaTime)
     var cellright = cellAtTileCoord(LAYER_PLATFORMS, tx + 1, ty);
     var celldown = cellAtTileCoord(LAYER_PLATFORMS, tx, ty + 1);
     var celldiag = cellAtTileCoord(LAYER_PLATFORMS, tx + 1, ty + 1);
-    console.log("collision matrix =" + cell + cellright + celldown + celldiag);
-    console.log("tileX =" + Math.floor(this.position.x/TILE));
 
     //If the player has vertical velocity, then check to see if they have hit a platform
     //below or above, in which case, stop their vertical velocity, and clamp their
@@ -214,39 +228,26 @@ Player.prototype.update = function (deltaTime)
 }
 
 
+Player.prototype.shoot = function()
+{
+    console.log("this direction =" + this.direction);
+    bullet = new Bullet();
+    bullet.position.x = this.position.x;
+    bullet.position.y = this.position.y;
+    if (this.direction == LEFT)
+    {
+        bullet.velocity.x = -600;
+    }
+    else
+    {
+        bullet.velocity.x = 600;
+    }
+    bullet.velocity.y = 0;   
+    bullets.push(bullet);
+}
+
 Player.prototype.draw = function(worldOffsetX)
 {
-    console.log("this.position.x =" + this.position.x);
-    console.log("worldOffsetX =" + worldOffsetX);
-    console.log("Drawn position =" + (this.position.x - worldOffsetX));
 	this.sprite.draw(context, this.position.x - worldOffsetX, this.position.y);
 }
 
-/*
-Player.prototype.shoot = function()
- {
-	console.log("shoot called");
-	var bullet = new Bullet();
-	 
-	 	//Start off with a velocity that shoots the bullet to the left.
-	var velX = 1;
-	var velY = 0;
-
-	//Now rotate this vector according to the ship's current rotation.
-	var s = Math.sin(player.rotation+0.75);
-	var c = Math.cos(player.rotation+0.75);
-	var xVel = (velX*c) - (velY*s);
-	var yVel = (velX*s) + (velY*c);
-	
-	//Don't bother storing a direction and calculating the
-	//velocity every frame, because it won't change.
-	//Just store the pre-calculated velocity.
-	bullet.x = player.x + xVel*player.width/3;
-	bullet.y = player.y + yVel*player.width/3;
-	bullet.velocityX = xVel*bullet.speed;
-	bullet.velocityY = yVel*bullet.speed;
-	
-	//Add bullet to list.
-	bullets.push(bullet);
- }
-*/ 

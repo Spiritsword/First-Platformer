@@ -25,13 +25,11 @@ var Keyboard = function() {
 
 Keyboard.prototype.onKeyDown = function(evt)
 {
-	console.log("keydown");
 	this.keys[evt.keyCode] = true;
 }
 
 Keyboard.prototype.onKeyUp = function(evt)
 {
-	console.log("keyup");
 	this.keys[evt.keyCode] = false;
 };
 

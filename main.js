@@ -46,6 +46,11 @@ var bullets = [];
 
 function runSplash(deltaTime)
 {
+    if (newState == true)
+    {
+        musicSplash.play();
+        newState = false;
+    }
     context.drawImage(splashImage, 0, 0);
     context.fillStyle = "#000";
     context.font = "96px Impact";
@@ -54,17 +59,24 @@ function runSplash(deltaTime)
     context.fillText(splashMessage, SCREEN_WIDTH * 1 / 2 - (splashMeasure.width / 2), SCREEN_HEIGHT * 1 / 2 + 20);
     splashTimer -= deltaTime;
     if (splashTimer <= 0) {
+        musicSplash.stop();
+        newState = true;
         gameState = STATE_GAME;
         return;
     }
 }
 
-function runGameover(deltaTime)
+function runGameoverLost(deltaTime)
 {
+    if (newState == true)
+    {
+        musicLost.play();
+        newState = false;
+    }
     context.drawImage(gameoverImage, 0, 0);
 
     context.font = "96px Impact";
-    gameoverMessage = "GAME OVER";
+    gameoverMessage = "YOU DIED";
     gameoverMeasure = context.measureText(gameoverMessage);
 
 //  context.font = "48px Impact";
@@ -145,9 +157,40 @@ function runGame(deltaTime)
 		};
 	};
 */
-    console.log("updating player");
+
+// Music, maestro!
+    if (newState == true)
+        {
+            musicGame.play();
+            newState = false;
+    }
+
+//Update everything
     player.update(deltaTime);
-    console.log("drawing map");
+
+    if (player.position.y > SCREEN_HEIGHT)
+    {
+        musicGame.stop();
+        newState = true;
+        gameState = STATE_GAMEOVER_LOST;
+    }
+
+    for(var i=bullets.length-1; i>=0; i--)
+    {
+        bullets[i].update(deltaTime);
+//Check if the bullet has gone out of the screen boundaries
+//and if so kill it.
+        if (bullets[i].x < 0
+            || bullets[i].x > MAP_WIDTH
+            || bullets[i].y < 0
+            || bullets[i].y > MAP_HEIGHT)
+        {
+            bullets.splice(i, 1);
+        }
+    }
+
+
+//Draw everything
     tileX = pixelToTile(player.position.x);
     startX = tileX - Math.floor(maxTiles / 2);
     offsetX = (TILE + player.position.x - tileToPixel(tileX));
@@ -164,12 +207,14 @@ function runGame(deltaTime)
     worldOffsetX = startX * TILE + offsetX;
     drawMap(startX, offsetX);
     //drawMap(9, -35);
-    console.log("drawing player");
-    player.draw(worldOffsetX);
-    if (player.position.y > SCREEN_HEIGHT)
+
+    for (var i = bullets.length - 1; i >= 0; i--)
     {
-        gameState = STATE_GAMEOVER;
+        bullets[i].draw();
     }
+
+    player.draw(worldOffsetX);
+
     //score
     context.fillStyle = "#D50020";
     context.font = "24px Arial";
@@ -188,56 +233,39 @@ function runGame(deltaTime)
 		enemy.draw();
 	};	
 
-	if (bullets.length >= 0)
-	{
-		for(var i=bullets.length-1; i>=0; i--)
-		{
-			bullets[i].draw(deltaTime);
-		};
-	};
-
-		
-	// update the frame counter 
-	fpsTime += deltaTime;
-	fpsCount++;
-	if(fpsTime >= 1)
-	{
-		fpsTime -= 1;
-		fps = fpsCount;
-		fpsCount = 0;
-	}		
-		
-	// draw the FPS
-	context.fillStyle = "#f00";
-	context.font="14px Arial";
-	context.fillText("FPS: " + fps, 5, 20, 100);
 	*/
 	
 }
 
 
-function run() {
+function run()
+{
     context.fillStyle = "#ccc";
     context.fillRect(0, 0, canvas.width, canvas.height);
 
     var deltaTime = getDeltaTime();
-    switch (gameState) {
+    switch (gameState)
+    {
         case STATE_SPLASH:
             runSplash(deltaTime);
             break;
         case STATE_GAME:
             runGame(deltaTime);
             break;
-        case STATE_GAMEOVER:
-            runGameover(deltaTime);
+        case STATE_GAMEOVER_LOST:
+            runGameoverLost(deltaTime);
+            break;
+        case STATE_GAMEOVER_WON:
+            runGameoverWon(deltaTime);
             break;
     }
 }
 
 
-initialize();
+mapInitialize();
+soundInitialize();
 gameState = STATE_SPLASH;
-splashTimer = 3;
+splashTimer = 8;
 
 //-------------------- Don't modify anything below here
 

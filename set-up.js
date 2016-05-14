@@ -3,8 +3,11 @@ var context = canvas.getContext("2d");
 var SCREEN_WIDTH = canvas.width;
 var SCREEN_HEIGHT = canvas.height;
 var shootTimer = 0;
-var MAP = {tw: 60, th:20};
+var MAP = { tw: 60, th: 20 };
 var TILE = 35;
+var MAP_WIDTH = MAP.tw * TILE;
+var MAP_HEIGHT = MAP.th * TILE;
+console.log("MAP_WIDTH =" + MAP_WIDTH);
 var TILESET_TILE = TILE*2;
 var TILESET_PADDING = 2;
 var TILESET_SPACING = 2;
@@ -35,7 +38,8 @@ var FRICTION = MAXDX * 6;
 var JUMP = METER * 1500;
 var STATE_SPLASH = 0;
 var STATE_GAME = 1;
-var STATE_GAMEOVER = 2;
+var STATE_GAMEOVER_LOST = 2;
+var STATE_GAMEOVER_WON = 3;
 var splashImage = document.createElement("img");
 splashImage.src = "grass_background.jpg";
 
@@ -47,6 +51,11 @@ var lifeImage = document.createElement("img");
 lifeImage.src = "lifesprites.png";
 var LIFETILE_WIDTH = 36;
 var LIFETILE_HEIGHT = 32;
+var musicBackground;
+var sfxFire;
+var sfxExplosion;
+var newState = true;
+
 
 
 function intersects(x1, y1, w1, h1, x2, y2, w2, h2)
