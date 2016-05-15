@@ -281,50 +281,52 @@ Player.prototype.updateRunJump =
         }
         
         //Setting acceleration
+
         this.ddy = GRAVITY;
-        switch (striving)
+
+        if (this.movtMode == LAND)
         {
-            case LEFT:
-                console.log("striving left");
-                if (this.velocity.x > 0) {
-                    this.ddx = -FRICTION; //Player skids.
-                }
-                else {
-                    this.ddx = this.ddx - ACCEL;  //Player runs to the left.
-                }
-                break;
+            switch (striving)
+            {
+                case LEFT:
+                    console.log("striving left");
+                    if (this.velocity.x > 0) {
+                        this.ddx = -FRICTION; //Player skids.
+                    }
+                    else {
+                        this.ddx = this.ddx - ACCEL;  //Player runs to the left.
+                    }
+                    break;
 
-            case RIGHT:
-                console.log("striving right");
-                if (this.velocity.x < 0) {
-                    this.ddx = FRICTION; //Player skids.
-                    console.log("this.ddx =" + this.ddx);
-                }
-                else {
-                    this.ddx = this.ddx + ACCEL;  //Player runs to the right.
-                    console.log("this.ddx =" + this.ddx);
-                }
-                break;
+                case RIGHT:
+                    console.log("striving right");
+                    if (this.velocity.x < 0) {
+                        this.ddx = FRICTION; //Player skids.
+                        console.log("this.ddx =" + this.ddx);
+                    }
+                    else {
+                        this.ddx = this.ddx + ACCEL;  //Player runs to the right.
+                        console.log("this.ddx =" + this.ddx);
+                    }
+                    break;
 
-            case STILL: //Player skids if moving.
-                console.log("striving still");
-                if (this.velocity.x > 0)
-                {
-                    this.ddx = -FRICTION;
-                    console.log("this.ddx =" + this.ddx);
-                }
-                else if (this.velocity.x < 0)
-                {
-                    this.ddx = FRICTION;
-                    console.log("this.ddx =" + this.ddx);
-                }
-                else
-                {
-                    this.ddx = 0;
-                }
-                break;
+                case STILL: //Player skids if moving.
+                    console.log("striving still");
+                    if (this.velocity.x > 0) {
+                        this.ddx = -FRICTION;
+                        console.log("this.ddx =" + this.ddx);
+                    }
+                    else if (this.velocity.x < 0) {
+                        this.ddx = FRICTION;
+                        console.log("this.ddx =" + this.ddx);
+                    }
+                    else {
+                        this.ddx = 0;
+                    }
+                    break;
+            }
         }
-        
+
         //Jumping if appropriate
         if (jump && (this.movtMode == LAND))
         {
