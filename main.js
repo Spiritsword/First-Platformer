@@ -158,7 +158,7 @@ function runGame(deltaTime)
 	};
 */
 
-// Music, maestro!
+// Music, maestro! - for game state
     if (newState == true)
         {
             musicGame.play();
@@ -168,7 +168,7 @@ function runGame(deltaTime)
 //Update everything
     player.update(deltaTime);
 
-    if (player.position.y > SCREEN_HEIGHT)
+    if (player.position.y > MAP_HEIGHT)
     {
         musicGame.stop();
         newState = true;
@@ -178,6 +178,7 @@ function runGame(deltaTime)
     for(var i=bullets.length-1; i>=0; i--)
     {
         bullets[i].update(deltaTime);
+
 //Check if the bullet has gone out of the screen boundaries
 //and if so kill it.
         if (bullets[i].x < 0
@@ -192,28 +193,42 @@ function runGame(deltaTime)
 
 //Draw everything
     tileX = pixelToTile(player.position.x);
-    startX = tileX - Math.floor(maxTiles / 2);
+    startX = tileX - Math.floor(maxTilesX / 2);
     offsetX = (TILE + player.position.x - tileToPixel(tileX));
     if (startX < -1)
     {
         startX = 0;
         offsetX = 0;
     }
-    if (startX > MAP.tw - maxTiles)
+    if (startX > MAP.tw - maxTilesX)
     {
-        startX = MAP.tw - maxTiles + 1;
+        startX = MAP.tw - maxTilesX + 1;
         offsetX = TILE;
     }
     worldOffsetX = startX * TILE + offsetX;
-    drawMap(startX, offsetX);
-    //drawMap(9, -35);
+
+    tileY = pixelToTile(player.position.y);
+    startY = tileY - Math.floor(maxTilesY / 2);
+    offsetY = (TILE + player.position.y - tileToPixel(tileY));
+    if (startY < -1) {
+        startY = 0;
+        offsetY = 0;
+    }
+    if (startY > MAP.th - maxTilesY) {
+        startY = MAP.th - maxTilesY + 1;
+        offsetY = TILE;
+    }
+    worldOffsetY = startY * TILE + offsetY;
+
+
+    drawMap(startX, offsetX, startY, offsetY);
 
     for (var i = bullets.length - 1; i >= 0; i--)
     {
         bullets[i].draw();
     }
 
-    player.draw(worldOffsetX);
+    player.draw(worldOffsetX, worldOffsetY);
 
     //score
     context.fillStyle = "#D50020";

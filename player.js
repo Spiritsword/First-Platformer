@@ -57,6 +57,7 @@ Player.prototype.update = function (deltaTime)
     }
 
     //This section actions change of state if needed.
+
     console.log("checking for ladders");
     var tx = pixelToTile(this.position.x);
     var ty = pixelToTile(this.position.y);
@@ -65,20 +66,42 @@ Player.prototype.update = function (deltaTime)
     var celldownLadder = cellAtTileCoord(LAYER_LADDERS, tx, ty + 1);
     var celldiagLadder = cellAtTileCoord(LAYER_LADDERS, tx + 1, ty + 1);
 
+    //Cancelling "ghost" ladders just offscreen.
+    if (tx < 0)
+    {
+        cellLadder = 0;
+        celldownLadder = 0;
+    }
+    if (tx > MAP.tw - 2)
+    {
+        cellrightLadder = 0;
+        celldiagLadder = 0;
+    }
+    if (ty < 0)
+    {
+        cellLadder = 0;
+        cellrightLadder = 0;
+    }
+    if (ty > MAP.th - 2)
+    {
+        celldownLadder = 0;
+        celldiagLadder = 0;
+    }
+
+
+
     if (this.state == RUN_JUMP && (cellLadder || cellrightLadder) && (keyboard.isKeyDown(keyboard.KEY_UP) == true))
     {
         //Clamp the x co-ordinate to the ladder.
         console.log("going up a ladder");
-        if (cellLadder)
+        if (cellLadder && cellrightLadder)
         {
-            this.position.x = tileToPixel(tx);
+            this.position.x = tileToPixel(tx) + TILE/2;
         }
         else
         {
-            this.position.x = tileToPixel(tx+1);
+            this.position.x = tileToPixel(tx + 1) + TILE/2;
         }
-        this.ddy = 0;
-        this.ddx = 0;
         this.velocity.x = 0;
         this.sprite.setAnimation(ANIM_CLIMB);
         this.state = CLIMB;
@@ -87,57 +110,46 @@ Player.prototype.update = function (deltaTime)
 
     if (this.state == RUN_JUMP && (celldownLadder || celldiagLadder) && (keyboard.isKeyDown(keyboard.KEY_DOWN) == true))
     {
-        //Clamp the x co-ordinate to the ladder.
+        //Clamp the x co-ordinate to the ladder, depending on exactly where the ladder is.
         console.log("going down a ladder");
-        if (celldownLadder)
+        if (celldownLadder && celldiagLadder)
         {
-            this.position.x = tileToPixel(tx);
+            this.position.x = tileToPixel(tx) + TILE/2;
         }
         else
         {
-            this.position.x = tileToPixel(tx+1);
+            this.position.x = tileToPixel(tx + 1) + TILE/2;
         }
-        this.ddy = 0;
-        this.ddx = 0;
         this.velocity.x = 0;
         this.sprite.setAnimation(ANIM_CLIMB);
         this.state = CLIMB;
         return;
     }
     console.log("state =" + this.state);
-    if (this.state == CLIMB && !celldownLadder && !cellLadder)  //Player has reached the top of the ladder.
+    if (this.state == CLIMB && !celldownLadder && !cellLadder)  //Player has reached the top of the ladder (and slightly overshot).
     {
         console.log("at top of a ladder");
-        this.position.y = tileToPixel(ty + 1);  //Clamp position
-        this.velocity.y = 0;                    //Clamp velocity
+        this.position.y = tileToPixel(ty + 1);  //Clamp y position
+        this.velocity.y = 0;                    //Clamp y velocity
         this.sprite.setAnimation(ANIM_IDLE_LEFT);
         this.state = RUN_JUMP;
         return;
     }
 
-    if (this.state == CLIMB && !celldownLadder && cellLadder)  //Player has reached the bottom of the ladder (or is just starting up).
+    if (this.state == CLIMB && !celldownLadder && cellLadder && !keyboard.isKeyDown(keyboard.KEY_UP))  //Player has reached the bottom of the ladder (or is just starting up) - but is not just starting up, because up not pressed.
     {
         console.log("bottom of a ladder");
-        this.position.y = tileToPixel(ty);  //Clamp position
-        this.velocity.y = 0;                //Clamp velocity
-        if (this.sprite.currentAnimation != ANIM_IDLE_LEFT)
-        {
-            this.sprite.setAnimation(ANIM_IDLE_LEFT)
-        }
-        if (keyboard.isKeyDown(keyboard.KEY_LEFT) || keyboard.isKeyDown(keyboard.KEY_RIGHT)) //Test to see if player is trying to escape from the ladder -
-        {
-            this.state = RUN_JUMP;                                                          //- in which case change the state back to RUN_JUMP.
-            return;
-        }
+        this.position.y = tileToPixel(ty);  //Clamp y position
+        this.velocity.y = 0;                //Clamp y velocity
+        this.sprite.setAnimation(ANIM_IDLE_LEFT);
+        this.state = RUN_JUMP;
     }
 }
 
 
 Player.prototype.updateClimb =
     function (deltaTime)
-    {
-        this.sprite.update(deltaTime);
-
+    {   //Resetting/updating the sprites and y velocity as appropriate
         if (keyboard.isKeyDown(keyboard.KEY_UP) == true)
         {
             this.velocity.y = -ASCEND_SPEED;
@@ -145,28 +157,32 @@ Player.prototype.updateClimb =
             {
                 this.sprite.setAnimation(ANIM_CLIMB)
             }
+            else
+            {
+                this.sprite.update(deltaTime);
+            }
 
         }
-
-        if (keyboard.isKeyDown(keyboard.KEY_DOWN) == true)
+        else if (keyboard.isKeyDown(keyboard.KEY_DOWN) == true)
         {
             this.velocity.y = DESCEND_SPEED;
             if (this.sprite.currentAnimation != ANIM_CLIMB) {
                 this.sprite.setAnimation(ANIM_CLIMB)
             }
+            else
+            {
+                this.sprite.update(deltaTime);
+            }
         }
-
-        var wasup = this.velocity.y < 0;
-        var wasdown = this.velocity.y > 0;
-
-        //Calculate the new position and velocity.
-        this.position.y = Math.floor(this.position.y + (deltaTime * this.velocity.y));
-        this.velocity.y = bound(this.velocity.y + (deltaTime * this.ddy), -MAXDY, MAXDY);
-
-        //Clamping code to prevent jiggle.
-        if ((wasup && (this.velocity.y > 0)) || wasdown && (this.velocity.y < 0)) {
+        else
+        {
             this.velocity.y = 0;
         }
+        //If neither up or down pressed then sprite is frozen.
+
+        //Calculating the new position and velocity (no acceleration and x is clamped)
+        this.position.y = Math.floor(this.position.y + (deltaTime * this.velocity.y));
+
     }
 
 
@@ -218,7 +234,8 @@ Player.prototype.updateRunJump =
                 switch (striving)
                 {            
                     case LEFT:
-                        if (this.sprite.currentAnimation != ANIM_JUMP_LEFT) {
+                        if (this.sprite.currentAnimation != ANIM_JUMP_LEFT)
+                        {
                             this.sprite.setAnimation(ANIM_JUMP_LEFT);
                         }
                         break;
@@ -233,12 +250,14 @@ Player.prototype.updateRunJump =
                 switch (striving)
                 {            
                     case LEFT:
-                        if (this.sprite.currentAnimation != ANIM_WALK_LEFT) {
+                        if (this.sprite.currentAnimation != ANIM_WALK_LEFT)
+                        {
                             this.sprite.setAnimation(ANIM_WALK_LEFT);
                         }
                         break;
                     case RIGHT:
-                        if (this.sprite.currentAnimation != ANIM_WALK_RIGHT) {
+                        if (this.sprite.currentAnimation != ANIM_WALK_RIGHT)
+                        {
                             this.sprite.setAnimation(ANIM_WALK_RIGHT);
                         }
                         break;
@@ -246,7 +265,8 @@ Player.prototype.updateRunJump =
                         switch (this.direction)
                         {
                             case LEFT:
-                                if (this.sprite.currentAnimation != ANIM_IDLE_LEFT) {
+                                if (this.sprite.currentAnimation != ANIM_IDLE_LEFT)
+                                {
                                     this.sprite.setAnimation(ANIM_IDLE_LEFT);
                                 }
                                 break;
@@ -261,7 +281,7 @@ Player.prototype.updateRunJump =
         }
         
         //Setting acceleration
-        var ddy = GRAVITY;
+        this.ddy = GRAVITY;
         switch (striving)
         {
             case LEFT:
@@ -308,8 +328,8 @@ Player.prototype.updateRunJump =
         //Jumping if appropriate
         if (jump && (this.movtMode == LAND))
         {
-            ddy = ddy - JUMP;           //Apply an instantaneous (large) vertical impulse.
-            this.movtMode == AIR;
+            this.ddy = this.ddy - JUMP;           //Apply an instantaneous (large) vertical impulse.
+            this.movtMode = AIR;
         }
 
         var wasleft = (this.velocity.x < 0);
@@ -433,8 +453,8 @@ Player.prototype.shoot = function()
     bullets.push(bullet);
 }
 
-Player.prototype.draw = function(worldOffsetX)
+Player.prototype.draw = function(worldOffsetX, worldOffsetY)
 {
-	this.sprite.draw(context, this.position.x - worldOffsetX, this.position.y);
+	this.sprite.draw(context, this.position.x - worldOffsetX, this.position.y - worldOffsetY);
 }
 
