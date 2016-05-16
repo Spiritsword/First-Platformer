@@ -39,10 +39,10 @@ var chuckNorris = document.createElement("img");
 chuckNorris.src = "hero.png";
 var player = new Player();
 var keyboard = new Keyboard();
-// var enemy = new Enemy();
 
-	//Create an array to hold all the bullets.
+//Create an array to hold all the bullets and another to hold the bombs.
 var bullets = [];
+var bombs = [];
 
 function runSplash(deltaTime)
 {
@@ -92,80 +92,27 @@ function runGameoverLost(deltaTime)
 }
 
 
-
 function runGame(deltaTime)
 {
-/*
-	//Update shootTimer.
-	if(shootTimer > 0)
-	shootTimer -= deltaTime;
-	
-	//Create new bullet if appropriate.
-	if(player.shooting)
-	{
-//		console.log("player shooting");
-	}
-	else
-	{
-//		console.log("player not shooting");
-	}
-	
-	//console.log("bullets.length = " + bullets.length);
-		
-	if (player.shooting && shootTimer <=0 && player.alive)
-	{
-		shootTimer += 0.3;
-		player.shoot();
-	}
-
-	//Check if any bullet has gone out of the screen boundaries
-	//and if so kill it.
-	for(var i=bullets.length-1; i>=0; i--)
-	{
-		if(bullets[i].x < 0
-			|| bullets[i].x > SCREEN_WIDTH
-			|| bullets[i].y < 0
-			|| bullets[i].y > SCREEN_HEIGHT)
-		{
-			bullets.splice(i, 1);
-		}
-	}
-
-	
-	//	console.log("player updating");
-	player.update(deltaTime);
-	
-	if (bullets.length >= 0)
-	{
-		for(var i=bullets.length-1; i>=0; i--)
-		{
-			bullets[i].update(deltaTime);
-		};
-	}
-	
-	//Check if any bullet has hit enemy.  If so, kill them both.
-	if (bullets.length >= 0 && enemy.alive)
-	{
-		for(var i=bullets.length-1; i>=0; i--)
-		{
-			if (collideswith(bullets[i],enemy))
-			{
-				bullets.splice(i,1);
-				enemy.alive = false;
-				console.log("enemy hit");
-			}
-		};
-	};
-*/
-
-// Music, maestro! - for game state
+    // Music, maestro! - for game state
     if (newState == true)
         {
             musicGame.play();
             newState = false;
     }
 
-//Update everything
+
+    //Create bomb, if appropriate.
+    bombSpawnTimer -= deltaTime;
+    if (bombSpawnTimer <= 0 && (bombsCreated < bombsOrdained))
+    {
+        bombSpawnTimer = 1;
+        spawnBomb();
+        bombsCreated++;
+    }
+
+    //Update everything
+
     player.update(deltaTime);
 
     if (player.position.y > MAP_HEIGHT)
@@ -173,21 +120,56 @@ function runGame(deltaTime)
         musicGame.stop();
         newState = true;
         gameState = STATE_GAMEOVER_LOST;
+        return;
     }
 
-    for(var i=bullets.length-1; i>=0; i--)
+    for (var i = bombs.length - 1; i >= 0; i--)
     {
+        bombs[i].update(deltaTime);
+
+        //If exploded bomb hits player at Frame 4 then gameover lost.
+        if ((bombs[i].exploded == true) && (bombs[i].spriteFrame == 4) && collidesWith(bombs[i], player))
+        {
+            gameState = STATE_GAMEOVER_LOST;
+            return;
+        }
+
+        //Check if the bomb has gone out of the screen boundaries or has finished exploding
+        //and if so kill it.
+        if (bombs[i].x < 0
+            || bombs[i].x > MAP_WIDTH
+            || bombs[i].y < 0
+            || bombs[i].y > MAP_HEIGHT
+            || bombs[i].spriteFrame >= 12)
+        {
+            bombs.splice(i, 1);
+        }
+    }
+
+    if ((bombs.length == 0) && (bombsCreated == bombsOrdained))
+    {
+        gameState = STATE_GAMEOVER_WON;
+        return;
+    }
+
+    for (var i = bullets.length - 1; i >= 0; i--) {
         bullets[i].update(deltaTime);
 
-//Check if the bullet has gone out of the screen boundaries
-//and if so kill it.
+        //Check if the bullet has gone out of the screen boundaries
+        //and if so kill it.
         if (bullets[i].x < 0
             || bullets[i].x > MAP_WIDTH
             || bullets[i].y < 0
-            || bullets[i].y > MAP_HEIGHT)
-        {
+            || bullets[i].y > MAP_HEIGHT) {
             bullets.splice(i, 1);
         }
+    }
+
+    if (player.position.y > MAP_HEIGHT)
+    {
+        musicGame.stop();
+        newState = true;
+        gameState = STATE_GAMEOVER_LOST;
     }
 
 
@@ -220,36 +202,42 @@ function runGame(deltaTime)
     }
     worldOffsetY = startY * TILE + offsetY;
 
-
+    //Drawing map
     drawMap(startX, offsetX, startY, offsetY);
 
+    //Drawing bullets
     for (var i = bullets.length - 1; i >= 0; i--)
     {
         bullets[i].draw();
     }
 
+    //Drawing player
     player.draw(worldOffsetX, worldOffsetY);
 
-    //score
+    //Drawing bombs
+    for (var i = bombs.length - 1; i >= 0; i--)
+    {
+        if (bombs[i].exploded == true)
+        {
+            bombs[i].drawExploded(worldOffsetX, worldOffsetY);
+        }
+        else
+        {
+            bombs[i].drawUnexploded(worldOffsetX, worldOffsetY);
+        }
+    }
+    
+    //Drawing score
     context.fillStyle = "#D50020";
     context.font = "24px Arial";
     var scoreText = "SCORE: " + score;
     context.fillText(scoreText, SCREEN_WIDTH - 198, 453);
 
-    //lives
+    //Drawing lives
     for(var i=0; i<lives; i++)
     {
         context.drawImage(lifeImage, 0, 0, LIFETILE_WIDTH, LIFETILE_HEIGHT, 20 + ((LIFETILE_WIDTH + 2) * i), 427, LIFETILE_WIDTH, LIFETILE_HEIGHT);
     }
-
-    /*
-	if (enemy.alive)                 
-	{
-		enemy.draw();
-	};	
-
-	*/
-	
 }
 
 

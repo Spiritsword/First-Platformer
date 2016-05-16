@@ -35,7 +35,7 @@ var ACCEL = MAXDX * 2;
 //Horizontal friction - take 1/6 second to stop from maxdx
 var FRICTION = MAXDX * 6;
 //(a large) instntaneous jump impulse
-var JUMP = METER * 3000;
+var JUMP = METER * 5000;
 var STATE_SPLASH = 0;
 var STATE_GAME = 1;
 var STATE_GAMEOVER_LOST = 2;
@@ -66,7 +66,9 @@ var UP = 0
 var DOWN = 1;
 var ASCEND_SPEED = 200;
 var DESCEND_SPEED = 300;
-
+var bombSpawnTimer = 3;
+var bombsCreated = 0;
+var bombsOrdained = 10;
 
 
 function intersects(x1, y1, w1, h1, x2, y2, w2, h2)
@@ -81,7 +83,7 @@ function intersects(x1, y1, w1, h1, x2, y2, w2, h2)
 	return true;
 }
 
-function collideswith(obj1,obj2)
+function collidesWith(obj1,obj2)
 {
 	return intersects(obj1.x, obj1.y, obj1.width, obj1.height, obj2.x, obj2.y, obj2.width, obj2.height);
 }
