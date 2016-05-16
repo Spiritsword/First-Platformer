@@ -41,12 +41,14 @@ var Player = function ()
     this.cooldownTimer = 0;
     this.ddx = 0;
     this.ddy = GRAVITY;
+    this.respawnTimer = 1;
 };
 
 
 Player.prototype.update = function (deltaTime)
 {
     //This section calls the relevant update function according to state.
+    console.log("player x velocity on update =" + this.velocity.x);
     if (this.state == RUN_JUMP)
     {
         this.updateRunJump(deltaTime);
@@ -58,7 +60,6 @@ Player.prototype.update = function (deltaTime)
 
     //This section actions change of state if needed.
 
-    console.log("checking for ladders");
     var tx = pixelToTile(this.position.x);
     var ty = pixelToTile(this.position.y);
     var cellLadder = cellAtTileCoord(LAYER_LADDERS, tx, ty);
@@ -93,7 +94,6 @@ Player.prototype.update = function (deltaTime)
     if (this.state == RUN_JUMP && (cellLadder || cellrightLadder) && (keyboard.isKeyDown(keyboard.KEY_UP) == true))
     {
         //Clamp the x co-ordinate to the ladder.
-        console.log("going up a ladder");
         if (cellLadder && cellrightLadder)
         {
             this.position.x = tileToPixel(tx) + TILE/2;
@@ -111,7 +111,6 @@ Player.prototype.update = function (deltaTime)
     if (this.state == RUN_JUMP && (celldownLadder || celldiagLadder) && (keyboard.isKeyDown(keyboard.KEY_DOWN) == true))
     {
         //Clamp the x co-ordinate to the ladder, depending on exactly where the ladder is.
-        console.log("going down a ladder");
         if (celldownLadder && celldiagLadder)
         {
             this.position.x = tileToPixel(tx) + TILE/2;
@@ -125,10 +124,9 @@ Player.prototype.update = function (deltaTime)
         this.state = CLIMB;
         return;
     }
-    console.log("state =" + this.state);
+
     if (this.state == CLIMB && !celldownLadder && !cellLadder)  //Player has reached the top of the ladder (and slightly overshot).
     {
-        console.log("at top of a ladder");
         this.position.y = tileToPixel(ty + 1);  //Clamp y position
         this.velocity.y = 0;                    //Clamp y velocity
         this.sprite.setAnimation(ANIM_IDLE_LEFT);
@@ -138,7 +136,6 @@ Player.prototype.update = function (deltaTime)
 
     if (this.state == CLIMB && !celldownLadder && cellLadder && !keyboard.isKeyDown(keyboard.KEY_UP))  //Player has reached the bottom of the ladder (or is just starting up) - but is not just starting up, because up not pressed.
     {
-        console.log("bottom of a ladder");
         this.position.y = tileToPixel(ty);  //Clamp y position
         this.velocity.y = 0;                //Clamp y velocity
         this.sprite.setAnimation(ANIM_IDLE_LEFT);
@@ -195,7 +192,6 @@ Player.prototype.updateRunJump =
         var striving = STILL;   //default value        
         if (keyboard.isKeyDown(keyboard.KEY_LEFT))
         {
-            console.log("keyboard left");
             striving = LEFT;
             this.direction = LEFT;
         }
@@ -203,7 +199,6 @@ Player.prototype.updateRunJump =
         {
             if (keyboard.isKeyDown(keyboard.KEY_RIGHT))
             {
-                console.log("keyboard right");
                 striving = RIGHT;
                 this.direction = RIGHT;
             }
@@ -283,13 +278,13 @@ Player.prototype.updateRunJump =
         //Setting acceleration
 
         this.ddy = GRAVITY;
+        this.ddx = 0;
 
         if (this.movtMode == LAND)
         {
             switch (striving)
             {
                 case LEFT:
-                    console.log("striving left");
                     if (this.velocity.x > 0) {
                         this.ddx = -FRICTION; //Player skids.
                     }
@@ -299,26 +294,20 @@ Player.prototype.updateRunJump =
                     break;
 
                 case RIGHT:
-                    console.log("striving right");
                     if (this.velocity.x < 0) {
                         this.ddx = FRICTION; //Player skids.
-                        console.log("this.ddx =" + this.ddx);
                     }
                     else {
                         this.ddx = this.ddx + ACCEL;  //Player runs to the right.
-                        console.log("this.ddx =" + this.ddx);
                     }
                     break;
 
                 case STILL: //Player skids if moving.
-                    console.log("striving still");
                     if (this.velocity.x > 0) {
                         this.ddx = -FRICTION;
-                        console.log("this.ddx =" + this.ddx);
                     }
                     else if (this.velocity.x < 0) {
                         this.ddx = FRICTION;
-                        console.log("this.ddx =" + this.ddx);
                     }
                     else {
                         this.ddx = 0;
@@ -346,7 +335,6 @@ Player.prototype.updateRunJump =
         //Clamping velocity to prevent jiggle.
         if ((wasleft && (this.velocity.x > 0)) || wasright && (this.velocity.x < 0))
         {
-            console.log("clamping velocity to 0 after friction");
             this.velocity.x = 0;
         }
 
@@ -381,7 +369,6 @@ Player.prototype.updateRunJump =
                 this.position.y = tileToPixel(ty);
                 this.velocity.y = 0;                //Stop downward velocity.
                 this.movtMode = LAND;               //Player is now on land.
-                console.log("landed");
                 ny = 0;                             //Player no longer overlaps the cells below.
             }
             else this.movtMode = AIR;               //If not on land then airborne (jumping/falling).
@@ -454,6 +441,16 @@ Player.prototype.shoot = function()
     bullet.velocity.y = 0;   
     bullets.push(bullet);
 }
+
+Player.prototype.respawn = function ()
+{
+    this.position.set(9 * TILE, 0 * TILE);
+    this.velocity.set(0, 0);
+    this.state = RUN_JUMP;
+    this.movtMode = AIR;
+    console.log(this.velocity);
+}
+
 
 Player.prototype.draw = function(worldOffsetX, worldOffsetY)
 {

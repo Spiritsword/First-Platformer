@@ -7,7 +7,6 @@ var MAP = { tw: 60, th: 20 };
 var TILE = 35;
 var MAP_WIDTH = MAP.tw * TILE;
 var MAP_HEIGHT = MAP.th * TILE;
-console.log("MAP_WIDTH =" + MAP_WIDTH);
 var TILESET_TILE = TILE*2;
 var TILESET_PADDING = 2;
 var TILESET_SPACING = 2;
@@ -27,7 +26,7 @@ var METER = TILE;
 //Very exaggerated gravity (6x)
 var GRAVITY = METER * 9.8 * 6;
 //Max horizonatal speed (10 tiles per second)
-var MAXDX = METER * 10;
+var MAXDX = METER * 15;
 //Max vertical speed (15 tiles per second)
 var MAXDY = METER * 15;
 //Horizontal acceleration - take 1/2 second to reach maxdx
@@ -35,11 +34,12 @@ var ACCEL = MAXDX * 2;
 //Horizontal friction - take 1/6 second to stop from maxdx
 var FRICTION = MAXDX * 6;
 //(a large) instntaneous jump impulse
-var JUMP = METER * 5000;
+var JUMP = METER * 8000;
 var STATE_SPLASH = 0;
 var STATE_GAME = 1;
 var STATE_GAMEOVER_LOST = 2;
 var STATE_GAMEOVER_WON = 3;
+var STATE_RESPAWN = 4;
 var splashImage = document.createElement("img");
 splashImage.src = "grass_background.jpg";
 
@@ -85,7 +85,7 @@ function intersects(x1, y1, w1, h1, x2, y2, w2, h2)
 
 function collidesWith(obj1,obj2)
 {
-	return intersects(obj1.x, obj1.y, obj1.width, obj1.height, obj2.x, obj2.y, obj2.width, obj2.height);
+	return intersects(obj1.position.x, obj1.position.y, obj1.width, obj1.height, obj2.position.x, obj2.position.y, obj2.width, obj2.height);
 }
 
 function cellAtPixelCoord(layer, x, y)

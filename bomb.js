@@ -2,12 +2,13 @@
 var Bomb = function ()
 {
     this.sprite = new Sprite("explosion.png");
-    this.sprite.buildAnimation(13, 1, 196, 196, 0.05, [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]);
+    this.sprite.buildAnimation(13, 1, 196, 196, 0.2, [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]);
     this.image = document.createElement("img");
+    this.image.src = "bomb.png";
+    this.width = 64;
+    this.height = 64;
     this.sprite.setAnimationOffset(0, -98, -98);
     this.position = new Vector2();
-    this.width = 196;
-    this.height = 196;
     this.velocity = new Vector2();
     this.velocity.set(0, 0);
     this.movtMode = AIR;
@@ -16,20 +17,24 @@ var Bomb = function ()
     this.exploded = false;
     this.explosionFrame = 0;
     this.justExploded = false;
-    this.spriteFrame - 0;
+    this.spriteFrame = 0;
     this.lifetime = 0;
     this.age = 0;
+    this.shot = false;
 };
 
 Bomb.prototype.update =
     function (deltaTime)
     {//Explode the bomb and set justExploded as and if appropriate.
-        if ((this.age >= this.lifetime) && (this.exploded == true))
+        if (((this.age >= this.lifetime) || this.shot) && (this.exploded == true))
         {
             this.justExploded = false;
         }
-        else if ((this.age >= this.lifetime) && this.exploded == false)
+
+        else if (((this.age >= this.lifetime) || this.shot) && this.exploded == false)
         {
+            this.width = 100;
+            this.height = 100;
             this.exploded = true;
             this.justExploded = true;
         }
@@ -70,8 +75,8 @@ Bomb.prototype.updateUnexploded =
     function (deltaTime)
     {
         //Age the bomb.
-
-
+        this.age += deltaTime;
+        
         //Calculating the new position and velocity.
         this.position.y = Math.floor(this.position.y + (deltaTime * this.velocity.y));
         this.position.x = Math.floor(this.position.x + (deltaTime * this.velocity.x));
@@ -98,7 +103,6 @@ Bomb.prototype.updateUnexploded =
                 //clamp the y position to avoid falling into platform below
                 this.position.y = tileToPixel(ty);
                 this.velocity.y = 0;                //Stop downward velocity.
-                console.log("landed");
                 ny = 0;                             //Player no longer overlaps the cells below.
             }
         }
@@ -155,10 +159,10 @@ Bomb.prototype.drawUnexploded = function(worldOffsetX, worldOffsetY)
 
 function spawnBomb()
 {
-    bomb = new Bomb ();
-    var bombTileX = Math.floor(MAP.tw*(Math.random()));
-    bomb.position.set = (tileToPixel(bombTileX), 0);
-    this.lifetime = 20*Math.random();
+    bomb = new Bomb();
+    var bombTileX = Math.floor(MAP.tw * (Math.random()));
+    bomb.position.set(tileToPixel(bombTileX), 0);
+    bomb.lifetime = 20 * Math.random();
     bombs.push(bomb);
 }
 

@@ -105,7 +105,6 @@ var level1 =
 
 function drawMap(startX, offsetX, startY, offsetY)
 {
-    console.log("drawing map");
     for (var layerIdx = LAYER_COUNT-1 ; layerIdx >=0 ; layerIdx--)
     {
         var idx = 0;
@@ -132,10 +131,8 @@ function drawMap(startX, offsetX, startY, offsetY)
 
 function mapInitialize()
 {
-    console.log("initialising map");
     for (var layerIdx = 0; layerIdx < LAYER_COUNT; layerIdx++)
     {
-        console.log("layerIdx =" + layerIdx);
         cells[layerIdx] = [];
         var idx = 0;
         for (var y = 0; y < level1.layers[layerIdx].height; y++)
@@ -164,5 +161,4 @@ function mapInitialize()
             }
         }
     }
-    console.log("finished initialising map");
 }

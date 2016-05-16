@@ -59,36 +59,81 @@ function runSplash(deltaTime)
     context.fillText(splashMessage, SCREEN_WIDTH * 1 / 2 - (splashMeasure.width / 2), SCREEN_HEIGHT * 1 / 2 + 20);
     splashTimer -= deltaTime;
     if (splashTimer <= 0) {
-        musicSplash.stop();
         newState = true;
         gameState = STATE_GAME;
         return;
     }
 }
 
+function runRespawn(deltaTime)
+{
+    if (newState)
+    {
+        musicGame.stop();
+        musicSplash.play();
+        newState = false;
+    }
+    if (player.respawnTimer <= 0)
+    {
+        player.respawn();
+        newState = true;
+        gameState = STATE_GAME;
+    }
+    else
+    {
+        context.font = "96px Impact";
+        gameoverMessage = "ARRGH!";
+        gameoverMeasure = context.measureText(gameoverMessage);
+
+        context.fillStyle = "#900";
+        context.font = "96px Impact";
+        context.fillText(gameoverMessage, SCREEN_WIDTH * 1 / 2 - (gameoverMeasure.width / 2), SCREEN_HEIGHT * 1 / 2 + 10);
+    }
+    player.respawnTimer -= deltaTime;
+}
+
+
 function runGameoverLost(deltaTime)
 {
     if (newState == true)
     {
+        musicGame.stop();
         musicLost.play();
         newState = false;
     }
     context.drawImage(gameoverImage, 0, 0);
 
     context.font = "96px Impact";
-    gameoverMessage = "YOU DIED";
+    gameoverMessage = "YOU DIED!";
     gameoverMeasure = context.measureText(gameoverMessage);
-
-//  context.font = "48px Impact";
-//  scoreMessage = "YOUR SCORE = " + score;
-//  var scoreMeasure = context.measureText(scoreMessage);
 
     context.fillStyle = "#900";
     context.font = "96px Impact";
     context.fillText(gameoverMessage, SCREEN_WIDTH * 1 / 2 - (gameoverMeasure.width / 2), SCREEN_HEIGHT * 1 / 2 + 10);
+}
 
-//  context.font = "48px Impact";
-//  context.fillText(scoreMessage, SCREEN_WIDTH * 1 / 2 - (scoreMeasure.width / 2), SCREEN_HEIGHT * 3 / 4 - 20);
+function runGameoverWon(deltaTime) {
+    if (newState == true) {
+        musicGame.stop();
+        musicWon.play();
+        newState = false;
+    }
+    context.drawImage(gameoverImage, 0, 0);
+
+    context.font = "96px Impact";
+    gameoverMessage = "YOU WON!";
+    gameoverMeasure = context.measureText(gameoverMessage);
+
+    context.font = "48px Impact";
+    scoreMessage = "YOUR SCORE = " + score;
+    var scoreMeasure = context.measureText(scoreMessage);
+
+    context.fillStyle = "#FF0";
+    context.font = "96px Impact";
+    context.fillText(gameoverMessage, SCREEN_WIDTH * 1 / 2 - (gameoverMeasure.width / 2), SCREEN_HEIGHT * 1 / 2 + 10);
+
+    context.font = "48px Impact";
+    context.fillText(scoreMessage, SCREEN_WIDTH * 1 / 2 - (scoreMeasure.width / 2), SCREEN_HEIGHT * 3 / 4 - 20);
 }
 
 
@@ -96,7 +141,8 @@ function runGame(deltaTime)
 {
     // Music, maestro! - for game state
     if (newState == true)
-        {
+    {
+            musicSplash.stop();
             musicGame.play();
             newState = false;
     }
@@ -111,16 +157,26 @@ function runGame(deltaTime)
         bombsCreated++;
     }
 
-    //Update everything
+    //Update everything and check for collisions.
 
     player.update(deltaTime);
 
     if (player.position.y > MAP_HEIGHT)
     {
-        musicGame.stop();
-        newState = true;
-        gameState = STATE_GAMEOVER_LOST;
-        return;
+        lives -= 1;
+        if (lives > 0)
+        {
+            newState = true;
+            player.respawnTimer = 1;
+            gameState = STATE_RESPAWN;
+            return;
+        }
+        else
+        {
+            newState = true;
+            gameState = STATE_GAMEOVER_LOST;
+            return;
+        }
     }
 
     for (var i = bombs.length - 1; i >= 0; i--)
@@ -128,10 +184,20 @@ function runGame(deltaTime)
         bombs[i].update(deltaTime);
 
         //If exploded bomb hits player at Frame 4 then gameover lost.
-        if ((bombs[i].exploded == true) && (bombs[i].spriteFrame == 4) && collidesWith(bombs[i], player))
+        if ((bombs[i].exploded == true) && (bombs[i].sprite.currentFrame == 4) && collidesWith(bombs[i], player))
         {
-            gameState = STATE_GAMEOVER_LOST;
-            return;
+            lives -= 1;
+            if (lives > 0) {
+                newState = true;
+                player.respawnTimer = 1;
+                gameState = STATE_RESPAWN;
+                return;
+            }
+            else {
+                newState = true;
+                gameState = STATE_GAMEOVER_LOST;
+                return;
+            }
         }
 
         //Check if the bomb has gone out of the screen boundaries or has finished exploding
@@ -140,19 +206,38 @@ function runGame(deltaTime)
             || bombs[i].x > MAP_WIDTH
             || bombs[i].y < 0
             || bombs[i].y > MAP_HEIGHT
-            || bombs[i].spriteFrame >= 12)
+            || bombs[i].sprite.currentFrame >= 12)
         {
             bombs.splice(i, 1);
         }
     }
 
+    //Check for collisions between bullets and unexploded bombs.
+    for (var i = bombs.length - 1; i >= 0; i--)
+    {
+        for (var j = bullets.length - 1; j >= 0; j--)
+        {
+            if (collidesWith(bombs[i],bullets[j]) && !bombs[i].exploded)
+            {
+                bombs[i].shot = true;
+                bullets.splice(j, 1);
+                score += 100;
+            }
+        }
+
+    }
+
+
+
     if ((bombs.length == 0) && (bombsCreated == bombsOrdained))
     {
+        newState = true;
         gameState = STATE_GAMEOVER_WON;
         return;
     }
 
-    for (var i = bullets.length - 1; i >= 0; i--) {
+    for (var i = bullets.length - 1; i >= 0; i--)
+    {
         bullets[i].update(deltaTime);
 
         //Check if the bullet has gone out of the screen boundaries
@@ -254,6 +339,9 @@ function run()
             break;
         case STATE_GAME:
             runGame(deltaTime);
+            break;
+        case STATE_RESPAWN:
+            runRespawn(deltaTime);
             break;
         case STATE_GAMEOVER_LOST:
             runGameoverLost(deltaTime);
