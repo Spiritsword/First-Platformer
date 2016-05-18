@@ -51,25 +51,38 @@ function runSplash(deltaTime)
         musicSplash.play();
         newState = false;
     }
+
+    if (splashTimer <= 0 || keyboard.isKeyDown(keyboard.KEY_SPACE)) {
+        newState = true;
+        musicSplash.stop();
+        gameState = STATE_GAME;
+        return;
+    }
+
     context.drawImage(splashImage, 0, 0);
+
     context.fillStyle = "#000";
     context.font = "96px Impact";
     splashMessage = "BLADE GUNNER";
     splashMeasure = context.measureText(splashMessage);
+
+    context.font = "48px Impact";
+    startMessage = "PRESS SPACE TO START";
+    startMessageMeasure = context.measureText(startMessage);
+
+    context.font = "96px Impact";
     context.fillText(splashMessage, SCREEN_WIDTH * 1 / 2 - (splashMeasure.width / 2), SCREEN_HEIGHT * 1 / 2 + 20);
+    
+    context.font = "48px Impact";
+    context.fillText(startMessage, SCREEN_WIDTH * 1 / 2 - (startMessageMeasure.width / 2), SCREEN_HEIGHT * 3 / 4 - 20);
+
     splashTimer -= deltaTime;
-    if (splashTimer <= 0) {
-        newState = true;
-        gameState = STATE_GAME;
-        return;
-    }
 }
 
 function runRespawn(deltaTime)
 {
     if (newState)
     {
-        musicGame.stop();
         musicSplash.play();
         newState = false;
     }
@@ -77,6 +90,7 @@ function runRespawn(deltaTime)
     {
         player.respawn();
         newState = true;
+        musicSplash.stop();
         gameState = STATE_GAME;
     }
     else
@@ -97,27 +111,65 @@ function runGameoverLost(deltaTime)
 {
     if (newState == true)
     {
-        musicGame.stop();
         musicLost.play();
         newState = false;
     }
+
+    if(keyboard.isKeyDown(keyboard.KEY_SPACE))
+    {
+        lives = 3;
+        score = 0;
+        bombs = [];
+        bullets = [];
+        bombSpawnTimer = 3;
+        bombsCreated = 0;
+        player = new Player();
+        newState = true;
+        gameState = STATE_GAME; 
+        musicLost.stop();
+    }
+
     context.drawImage(gameoverImage, 0, 0);
 
     context.font = "96px Impact";
     gameoverMessage = "YOU DIED!";
     gameoverMeasure = context.measureText(gameoverMessage);
 
+    context.font = "48px Impact";
+    restartMessage = "PRESS SPACE TO RESTART";
+    restartMessageMeasure = context.measureText(restartMessage);
+
     context.fillStyle = "#900";
     context.font = "96px Impact";
     context.fillText(gameoverMessage, SCREEN_WIDTH * 1 / 2 - (gameoverMeasure.width / 2), SCREEN_HEIGHT * 1 / 2 + 10);
+
+    context.font = "48px Impact";
+    context.fillText(restartMessage, SCREEN_WIDTH * 1 / 2 - (restartMessageMeasure.width / 2), SCREEN_HEIGHT * 3 / 4 - 20);
+
 }
 
-function runGameoverWon(deltaTime) {
-    if (newState == true) {
-        musicGame.stop();
+function runGameoverWon(deltaTime)
+{
+    if (newState == true) 
+    {
         musicWon.play();
         newState = false;
     }
+
+    if(keyboard.isKeyDown(keyboard.KEY_SPACE))
+    {
+        lives = 3;
+        score = 0;
+        bombs = [];
+        bullets = [];
+        bombSpawnTimer = 3;
+        bombsCreated = 0;
+        player = new Player();
+        newState = true;
+        gameState = STATE_GAME;
+        musicWon.stop();
+    }
+
     context.drawImage(gameoverImage, 0, 0);
 
     context.font = "96px Impact";
@@ -126,7 +178,11 @@ function runGameoverWon(deltaTime) {
 
     context.font = "48px Impact";
     scoreMessage = "YOUR SCORE = " + score;
-    var scoreMeasure = context.measureText(scoreMessage);
+    scoreMeasure = context.measureText(scoreMessage);
+
+    context.font = "36px Impact";
+    restartMessage = "PRESS SPACE TO RESTART";
+    restartMessageMeasure = context.measureText(restartMessage);
 
     context.fillStyle = "#FF0";
     context.font = "96px Impact";
@@ -134,6 +190,9 @@ function runGameoverWon(deltaTime) {
 
     context.font = "48px Impact";
     context.fillText(scoreMessage, SCREEN_WIDTH * 1 / 2 - (scoreMeasure.width / 2), SCREEN_HEIGHT * 3 / 4 - 20);
+
+    context.font = "36px Impact";
+    context.fillText(restartMessage, SCREEN_WIDTH * 1 / 2 - (restartMessageMeasure.width / 2), SCREEN_HEIGHT * 7 / 8);
 }
 
 
@@ -142,7 +201,6 @@ function runGame(deltaTime)
     // Music, maestro! - for game state
     if (newState == true)
     {
-            musicSplash.stop();
             musicGame.play();
             newState = false;
     }
@@ -168,12 +226,14 @@ function runGame(deltaTime)
         {
             newState = true;
             player.respawnTimer = 1;
+            musicGame.stop();
             gameState = STATE_RESPAWN;
             return;
         }
         else
         {
             newState = true;
+            musicGame.stop();
             gameState = STATE_GAMEOVER_LOST;
             return;
         }
@@ -184,17 +244,19 @@ function runGame(deltaTime)
         bombs[i].update(deltaTime);
 
         //If exploded bomb hits player at Frame 4 then gameover lost.
-        if ((bombs[i].exploded == true) && (bombs[i].sprite.currentFrame == 4) && collidesWith(bombs[i], player))
+        if ((bombs[i].exploded == true) && (bombs[i].sprite.currentFrame == 4) && collidesWith(bombs[i], 17, 3, player, 17, 17))
         {
             lives -= 1;
             if (lives > 0) {
                 newState = true;
                 player.respawnTimer = 1;
+                musicGame.stop();
                 gameState = STATE_RESPAWN;
                 return;
             }
             else {
                 newState = true;
+                musicGame.stop();
                 gameState = STATE_GAMEOVER_LOST;
                 return;
             }
@@ -217,7 +279,7 @@ function runGame(deltaTime)
     {
         for (var j = bullets.length - 1; j >= 0; j--)
         {
-            if (collidesWith(bombs[i],bullets[j]) && !bombs[i].exploded)
+            if (collidesWith(bombs[i], 17, 3, bullets[j], 0, 0) && !bombs[i].exploded)
             {
                 bombs[i].shot = true;
                 bullets.splice(j, 1);
@@ -232,6 +294,7 @@ function runGame(deltaTime)
     if ((bombs.length == 0) && (bombsCreated == bombsOrdained))
     {
         newState = true;
+        musicGame.stop();
         gameState = STATE_GAMEOVER_WON;
         return;
     }

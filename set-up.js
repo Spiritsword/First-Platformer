@@ -2,7 +2,6 @@ var canvas = document.getElementById("gameCanvas");
 var context = canvas.getContext("2d");
 var SCREEN_WIDTH = canvas.width;
 var SCREEN_HEIGHT = canvas.height;
-var shootTimer = 0;
 var MAP = { tw: 60, th: 20 };
 var TILE = 35;
 var MAP_WIDTH = MAP.tw * TILE;
@@ -83,9 +82,9 @@ function intersects(x1, y1, w1, h1, x2, y2, w2, h2)
 	return true;
 }
 
-function collidesWith(obj1,obj2)
+function collidesWith(obj1, obj1Xoffset, obj1Yoffset, obj2, obj2Xoffset, obj2Yoffset)
 {
-	return intersects(obj1.position.x, obj1.position.y, obj1.width, obj1.height, obj2.position.x, obj2.position.y, obj2.width, obj2.height);
+    return intersects(obj1.position.x + obj1Xoffset, obj1.position.y + obj1Yoffset, obj1.width, obj1.height, obj2.position.x + obj2Xoffset, obj2.position.y + obj2Yoffset, obj2.width, obj2.height);
 }
 
 function cellAtPixelCoord(layer, x, y)

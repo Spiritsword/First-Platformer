@@ -33,8 +33,8 @@ Bomb.prototype.update =
 
         else if (((this.age >= this.lifetime) || this.shot) && this.exploded == false)
         {
-            this.width = 100;
-            this.height = 100;
+            this.width = 120;
+            this.height = 120;
             this.exploded = true;
             this.justExploded = true;
         }
@@ -56,6 +56,7 @@ Bomb.prototype.updateExploded =
         if (this.justExploded)
         {
             this.sprite.setAnimation(0);
+            sfxExplosion.play();
             this.justExploded = false;
         }
         else
@@ -153,7 +154,7 @@ Bomb.prototype.drawUnexploded = function(worldOffsetX, worldOffsetY)
 {
     context.save();
     context.translate (this.position.x - worldOffsetX, this.position.y - worldOffsetY)
-    context.drawImage(this.image, -this.width/2, -this.height/2);
+    context.drawImage(this.image, -15, -29);
     context.restore()
 }
 

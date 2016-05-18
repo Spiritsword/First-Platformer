@@ -31,14 +31,14 @@ var Player = function ()
 
     this.position = new Vector2();
     this.position.set(9 * TILE, 0 * TILE);
-    this.width = 159;
-    this.height = 163;
+    this.width = 35;
+    this.height = 35;
     this.velocity = new Vector2();
     this.movtMode = AIR;
     this.shooting = false;
     this.state = RUN_JUMP;
     this.direction = LEFT;
-    this.cooldownTimer = 0;
+    this.cooldownTimer = 1;
     this.ddx = 0;
     this.ddy = GRAVITY;
     this.respawnTimer = 1;
@@ -48,7 +48,6 @@ var Player = function ()
 Player.prototype.update = function (deltaTime)
 {
     //This section calls the relevant update function according to state.
-    console.log("player x velocity on update =" + this.velocity.x);
     if (this.state == RUN_JUMP)
     {
         this.updateRunJump(deltaTime);
@@ -186,6 +185,7 @@ Player.prototype.updateClimb =
 Player.prototype.updateRunJump =
     function (deltaTime)
     {
+        console.log(this.movtMode);
         //Setting up the local variables
         shooting = keyboard.isKeyDown(keyboard.KEY_SPACE);
         jump = keyboard.isKeyDown(keyboard.KEY_UP);
@@ -211,7 +211,8 @@ Player.prototype.updateRunJump =
             switch (this.direction)
             {            
                 case LEFT:
-                    if (this.sprite.currentAnimation != ANIM_SHOOT_LEFT) {
+                    if (this.sprite.currentAnimation != ANIM_SHOOT_LEFT)
+                    {
                         this.sprite.setAnimation(ANIM_SHOOT_LEFT);
                     }
                     break;
@@ -226,8 +227,8 @@ Player.prototype.updateRunJump =
         else switch (this.movtMode)
         {
             case AIR:
-                switch (striving)
-                {            
+                switch (this.direction)
+                {
                     case LEFT:
                         if (this.sprite.currentAnimation != ANIM_JUMP_LEFT)
                         {
@@ -241,6 +242,7 @@ Player.prototype.updateRunJump =
                         }
                         break;
                 }
+                break;
             case LAND:
                 switch (striving)
                 {            
@@ -400,6 +402,7 @@ Player.prototype.updateRunJump =
         }
         else if (this.velocity.x < 0)
         {
+
             if ((cell && !cellright) || (celldown && !celldiag && ny))
             {
                 //Clamp the x position to avoid moving into the platform we just hit.
@@ -419,7 +422,7 @@ Player.prototype.updateRunJump =
         if (shooting && this.cooldownTimer <= 0)
         {
             sfxFire.play();
-            this.shoot();     //Shoot a bullet
+            this.shoot();     //Shoot a bullet  
             this.cooldownTimer = 0.3;
         }
     }
@@ -448,7 +451,6 @@ Player.prototype.respawn = function ()
     this.velocity.set(0, 0);
     this.state = RUN_JUMP;
     this.movtMode = AIR;
-    console.log(this.velocity);
 }
 
 
