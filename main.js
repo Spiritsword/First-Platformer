@@ -26,14 +26,6 @@ function getDeltaTime()
 
 //-------------------- Don't modify anything above here
 
-
-// Some variables to calculate the Frames Per Second (FPS - this tells use
-// how fast our game is running, and allows us to make the game run at a 
-// constant speed)
-// var fps = 0;
-// var fpsCount = 0;
-// var fpsTime = 0;
-
 // Create player and keyboard.
 var player = new Player();
 var keyboard = new Keyboard();

@@ -64,7 +64,6 @@ Bomb.prototype.updateExploded =
         }
 
         this.sprite.update(deltaTime);
- //     this.spriteFrame++;
         {  //Velocity of explosion debris centre of gravity is taken from original bomb velocity.
             this.position.y = Math.floor(this.position.y + (deltaTime * this.velocity.y));
             this.position.x = Math.floor(this.position.x + (deltaTime * this.velocity.x));
