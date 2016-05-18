@@ -1,4 +1,3 @@
-
 var Bomb = function ()
 {
     this.sprite = new Sprite("explosion.png");
@@ -65,8 +64,8 @@ Bomb.prototype.updateExploded =
         }
 
         this.sprite.update(deltaTime);
-        this.spriteFrame++;
-        {  //Velocity of explosion debris is taken from original bomb velocity.
+ //     this.spriteFrame++;
+        {  //Velocity of explosion debris centre of gravity is taken from original bomb velocity.
             this.position.y = Math.floor(this.position.y + (deltaTime * this.velocity.y));
             this.position.x = Math.floor(this.position.x + (deltaTime * this.velocity.x));
         }
@@ -145,12 +144,14 @@ Bomb.prototype.updateUnexploded =
     }
 
 
-Bomb.prototype.drawExploded = function(worldOffsetX, worldOffsetY)
+Bomb.prototype.drawExploded = function (worldOffsetX, worldOffsetY)
+//Exploded bomb is sprite.
 {
 	this.sprite.draw(context, this.position.x - worldOffsetX, this.position.y - worldOffsetY);
 }
 
-Bomb.prototype.drawUnexploded = function(worldOffsetX, worldOffsetY)
+Bomb.prototype.drawUnexploded = function (worldOffsetX, worldOffsetY)
+//Unexploded bomb is image.
 {
     context.save();
     context.translate (this.position.x - worldOffsetX, this.position.y - worldOffsetY)

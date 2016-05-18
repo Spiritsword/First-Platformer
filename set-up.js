@@ -28,9 +28,9 @@ var GRAVITY = METER * 9.8 * 6;
 var MAXDX = METER * 15;
 //Max vertical speed (15 tiles per second)
 var MAXDY = METER * 15;
-//Horizontal acceleration - take 1/2 second to reach maxdx
+//Horizontal acceleration
 var ACCEL = MAXDX * 2;
-//Horizontal friction - take 1/6 second to stop from maxdx
+//Horizontal friction
 var FRICTION = MAXDX * 6;
 //(a large) instntaneous jump impulse
 var JUMP = METER * 8000;
@@ -41,7 +41,6 @@ var STATE_GAMEOVER_WON = 3;
 var STATE_RESPAWN = 4;
 var splashImage = document.createElement("img");
 splashImage.src = "grass_background.jpg";
-
 var gameoverImage = document.createElement("img");
 gameoverImage.src = "grass_background.jpg";
 var score = 0;
@@ -83,26 +82,14 @@ function intersects(x1, y1, w1, h1, x2, y2, w2, h2)
 }
 
 function collidesWith(obj1, obj1Xoffset, obj1Yoffset, obj2, obj2Xoffset, obj2Yoffset)
+//Offsets are used to adjust position to the centre of the object.
 {
     return intersects(obj1.position.x + obj1Xoffset, obj1.position.y + obj1Yoffset, obj1.width, obj1.height, obj2.position.x + obj2Xoffset, obj2.position.y + obj2Yoffset, obj2.width, obj2.height);
 }
 
 function cellAtPixelCoord(layer, x, y)
 {
-//    if(x<0 || x>MAP_WIDTH || y<0)
-//    {
-//        return 1;
-//   }
-    //Let the player drop off the bottom of the screen (This means death.)/
-//    else 
-//        if(y>MAP_HEIGHT)
-//        {
-//            return 0;
-//        }
-//        else
-//        {
             return cellAtTileCoord(layer, pixelToTile(x), pixelToTile(y));
-//        }
 }
 
 function cellAtTileCoord(layer, tx, ty)

@@ -27,16 +27,14 @@ function getDeltaTime()
 //-------------------- Don't modify anything above here
 
 
-// some variables to calculate the Frames Per Second (FPS - this tells use
+// Some variables to calculate the Frames Per Second (FPS - this tells use
 // how fast our game is running, and allows us to make the game run at a 
 // constant speed)
-var fps = 0;
-var fpsCount = 0;
-var fpsTime = 0;
+// var fps = 0;
+// var fpsCount = 0;
+// var fpsTime = 0;
 
-// load an image to draw
-var chuckNorris = document.createElement("img");
-chuckNorris.src = "hero.png";
+// Create player and keyboard.
 var player = new Player();
 var keyboard = new Keyboard();
 
@@ -132,7 +130,7 @@ function runGameoverLost(deltaTime)
     context.drawImage(gameoverImage, 0, 0);
 
     context.font = "96px Impact";
-    gameoverMessage = "YOU DIED!";
+    gameoverMessage = "YOU LOST!";
     gameoverMeasure = context.measureText(gameoverMessage);
 
     context.font = "48px Impact";
@@ -321,7 +319,8 @@ function runGame(deltaTime)
     }
 
 
-//Draw everything
+    //Draw everything.
+
     tileX = pixelToTile(player.position.x);
     startX = tileX - Math.floor(maxTilesX / 2);
     offsetX = (TILE + player.position.x - tileToPixel(tileX));
