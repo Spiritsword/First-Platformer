@@ -97,6 +97,10 @@ Player.prototype.update = function (deltaTime)
         {
             this.position.x = tileToPixel(tx) + TILE/2;
         }
+        else if (cellLadder && !cellrightLadder)
+        {
+            this.position.x = tileToPixel(tx - 1) + TILE / 2;
+        }
         else
         {
             this.position.x = tileToPixel(tx + 1) + TILE/2;
@@ -113,6 +117,10 @@ Player.prototype.update = function (deltaTime)
         if (celldownLadder && celldiagLadder)
         {
             this.position.x = tileToPixel(tx) + TILE/2;
+        }
+        else if (cellLadder && !cellrightLadder)
+        {
+            this.position.x = tileToPixel(tx - 1) + TILE / 2;
         }
         else
         {
