@@ -51,7 +51,7 @@ function runSplash(deltaTime)
 
     context.drawImage(splashImage, 0, 0);
 
-    context.fillStyle = "#000";
+    context.fillStyle = "#900";
     context.font = "96px Impact";
     splashMessage = "BLADE GUNNER";
     splashMeasure = context.measureText(splashMessage);
@@ -60,11 +60,19 @@ function runSplash(deltaTime)
     startMessage = "PRESS SPACE TO START";
     startMessageMeasure = context.measureText(startMessage);
 
+    context.font = "36px Impact";
+    instructionMessage = "(SURVIVE UNTIL ALL BOMBS HAVE EXPLODED)";
+    instructionMessageMeasure = context.measureText(instructionMessage);
+
     context.font = "96px Impact";
     context.fillText(splashMessage, SCREEN_WIDTH * 1 / 2 - (splashMeasure.width / 2), SCREEN_HEIGHT * 1 / 2 + 20);
     
     context.font = "48px Impact";
     context.fillText(startMessage, SCREEN_WIDTH * 1 / 2 - (startMessageMeasure.width / 2), SCREEN_HEIGHT * 3 / 4 - 20);
+
+    context.fillStyle = "#FF0";
+    context.font = "36px Impact";
+    context.fillText(instructionMessage, SCREEN_WIDTH * 1 / 2 - (instructionMessageMeasure.width / 2), SCREEN_HEIGHT * 7 / 8);
 
     splashTimer -= deltaTime;
 }
@@ -370,8 +378,14 @@ function runGame(deltaTime)
     context.fillStyle = "#D50020";
     context.font = "24px Arial";
     var scoreText = "SCORE: " + score;
-    context.fillText(scoreText, SCREEN_WIDTH - 198, 453);
+    context.fillText(scoreText, SCREEN_WIDTH - 158, 453);
 
+    //Drawing bombs remaining
+    context.fillStyle = "#D50020";
+    context.font = "24px Arial";
+    var bombsText = "BOMBS REMAINING: " + (bombsOrdained - bombsCreated + bombs.length);
+    context.fillText(bombsText, SCREEN_WIDTH - 458, 453);
+    
     //Drawing lives
     for(var i=0; i<lives; i++)
     {
