@@ -1,5 +1,5 @@
 # First-Platformer
-Platformer for AIE Games Programming Course 2016.
+Platformer game created by Jonathan Puddicombe for AIE Games Programming Course 2016.
 
 To play, go to http://spiritsword.github.io/First-Platformer/
 
